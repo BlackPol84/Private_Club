@@ -1,0 +1,15 @@
+CREATE TABLE IF NOT EXISTS users (
+id SERIAL PRIMARY KEY  NOT NULL,
+surname VARCHAR(50),
+name VARCHAR(50),
+middle_name VARCHAR(50)
+);
+
+CREATE TABLE IF NOT EXISTS user_qr_codes (
+id SERIAL PRIMARY KEY NOT NULL,
+user_id INT,
+uuid UUID,
+FOREIGN KEY (user_id) REFERENCES users (id)
+);
+
+
