@@ -3,6 +3,7 @@ package ru.ykul.service;
 import ru.ykul.dao.UserQrCodesDao;
 import ru.ykul.dao.UsersDao;
 import ru.ykul.model.User;
+import ru.ykul.model.UserQrCode;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -18,11 +19,11 @@ public class UserQrService {
         this.userQrCodesDao = userQrCodesDao;
     }
 
-    public void checkingUserUuid(UUID uuid) {
+    public void checkUserUuid(UUID uuid) {
 
         Optional<User> userOptional = usersDao.getUserByUuid(uuid);
         userOptional.ifPresentOrElse(user -> {System.out.println(user.getSurname() +
-                " " + user.getName() + " " + user.getMiddleName()); userQrCodesDao.update(user);},
-                () -> System.out.println("Человека с таким uuid в базе нет"));
+                " " + user.getName() + " " + user.getMiddleName()); userQrCodesDao.updateByUserId(user.getId());},
+                () -> System.out.println("Пользователь с uuid: " + uuid + " не найден"));
     }
 }

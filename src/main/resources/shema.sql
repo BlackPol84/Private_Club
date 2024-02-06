@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS users (
 id SERIAL PRIMARY KEY NOT NULL,
-surname VARCHAR(50),
-name VARCHAR(50),
-middle_name VARCHAR(50)
+surname VARCHAR(50) NOT NULL,
+name VARCHAR(50) NOT NULL,
+middle_name VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS user_qr_codes (

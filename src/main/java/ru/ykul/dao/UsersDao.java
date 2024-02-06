@@ -32,42 +32,25 @@ public class UsersDao {
         }
     }
 
-    private Optional<User> resultSetMapping(ResultSet resultSet) throws SQLException {
-
-        if(resultSet.next()) {
-
-            int id = resultSet.getInt("id");
-            String surname = resultSet.getString("surname");
-            String name = resultSet.getString("name");
-            String middleName = resultSet.getString("middle_name");
-
-            User user = new User(id, surname, name, middleName);
-
-            return Optional.of(user);
-        } else {
-            return Optional.empty();
-        }
-    }
-
     public User create(User user) {
 
         String createUserQuery = "INSERT INTO users (surname, name, middle_name) " +
                 "VALUES (?, ?, ?);";
 
         try(Connection connection = PostgreSQLConnection.getConnection();
-            PreparedStatement createUserQueryStatement = connection.prepareStatement(createUserQuery,
+            PreparedStatement ps = connection.prepareStatement(createUserQuery,
                     PreparedStatement.RETURN_GENERATED_KEYS)) {
-            createUserQueryStatement.setString(1, user.getSurname());
-            createUserQueryStatement.setString(2, user.getName());
-            createUserQueryStatement.setString(3, user.getMiddleName());
+            ps.setString(1, user.getSurname());
+            ps.setString(2, user.getName());
+            ps.setString(3, user.getMiddleName());
 
-            createUserQueryStatement.executeUpdate();
+            ps.executeUpdate();
 
-            try(ResultSet generatedKeys = createUserQueryStatement.getGeneratedKeys()) {
+            try(ResultSet generatedKeys = ps.getGeneratedKeys()) {
                 if(generatedKeys.next()) {
                     user.setId(generatedKeys.getInt(1));
                 } else {
-                    throw new SQLException();
+                    throw new SQLException("Не удалось получить сгенерированный ключ");
                 }
             }
         } catch (SQLException e) {
@@ -82,13 +65,13 @@ public class UsersDao {
                 "WHERE id = ?";
 
         try(Connection connection = PostgreSQLConnection.getConnection();
-            PreparedStatement updateUserQueryStatement = connection.prepareStatement(updateUserQuery)) {
-            updateUserQueryStatement.setString(1, user.getSurname());
-            updateUserQueryStatement.setString(2, user.getName());
-            updateUserQueryStatement.setString(3, user.getMiddleName());
-            updateUserQueryStatement.setInt(4, user.getId());
+            PreparedStatement ps = connection.prepareStatement(updateUserQuery)) {
+            ps.setString(1, user.getSurname());
+            ps.setString(2, user.getName());
+            ps.setString(3, user.getMiddleName());
+            ps.setInt(4, user.getId());
 
-            updateUserQueryStatement.executeUpdate();
+            ps.executeUpdate();
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -100,13 +83,29 @@ public class UsersDao {
         String deleteUserQuery = "DELETE FROM users WHERE id = ?";
 
         try(Connection connection = PostgreSQLConnection.getConnection();
-            PreparedStatement deleteUserQueryStatement = connection.prepareStatement(deleteUserQuery)) {
-            deleteUserQueryStatement.setInt(1, user.getId());
+            PreparedStatement ps = connection.prepareStatement(deleteUserQuery)) {
+            ps.setInt(1, user.getId());
 
-            deleteUserQueryStatement.executeUpdate();
+            ps.executeUpdate();
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private Optional<User> resultSetMapping(ResultSet resultSet) throws SQLException {
+
+        if(resultSet.next()) {
+
+            int id = resultSet.getInt("id");
+            String surname = resultSet.getString("surname");
+            String name = resultSet.getString("name");
+            String middleName = resultSet.getString("middle_name");
+
+            User user = new User(id, surname, name, middleName);
+
+            return Optional.of(user);
+        }
+        return Optional.empty();
     }
 }
