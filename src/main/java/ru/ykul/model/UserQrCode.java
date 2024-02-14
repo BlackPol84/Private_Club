@@ -38,3 +38,4 @@ public class UserQrCode {
         this.uuid = uuid;
     }
 }
+

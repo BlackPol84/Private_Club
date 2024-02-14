@@ -1,6 +1,6 @@
 package ru.ykul.dao;
 
-import ru.ykul.database.PostgreSQLConnection;
+import ru.ykul.config.DBConnection;
 import ru.ykul.model.User;
 
 import java.sql.Connection;
@@ -14,21 +14,26 @@ public class UsersDao {
 
     public Optional<User> getUserByUuid(UUID uuid) {
 
-        String uuidString = uuid.toString();
+        if(uuid != null) {
 
-        String query = "SELECT users.id, users.surname, users.name, users.middle_name " +
-                "FROM users JOIN " +
-                "user_qr_codes ON user_qr_codes.user_id = users.id " +
-                "WHERE user_qr_codes.uuid::text like ?;";
+            String uuidString = uuid.toString();
 
-        try (Connection connection = PostgreSQLConnection.getConnection();
-            PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setString(1, uuidString);
-            try (ResultSet resultSet = ps.executeQuery()) {
-                return resultSetMapping(resultSet);
+            String query = "SELECT users.id, users.surname, users.name, users.middle_name " +
+                    "FROM users JOIN " +
+                    "user_qr_codes ON user_qr_codes.user_id = users.id " +
+                    "WHERE user_qr_codes.uuid::text like ?;";
+
+            try (Connection connection = DBConnection.getConnection();
+                 PreparedStatement ps = connection.prepareStatement(query)) {
+                ps.setString(1, uuidString);
+                try (ResultSet resultSet = ps.executeQuery()) {
+                    return resultSetMapping(resultSet);
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        } else {
+            throw new IllegalArgumentException ("The uuid is null");
         }
     }
 
@@ -37,7 +42,7 @@ public class UsersDao {
         String createUserQuery = "INSERT INTO users (surname, name, middle_name) " +
                 "VALUES (?, ?, ?);";
 
-        try(Connection connection = PostgreSQLConnection.getConnection();
+        try(Connection connection = DBConnection.getConnection();
             PreparedStatement ps = connection.prepareStatement(createUserQuery,
                     PreparedStatement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, user.getSurname());
@@ -64,7 +69,7 @@ public class UsersDao {
         String updateUserQuery = "UPDATE users SET surname = ?, name = ?, middle_name = ?" +
                 "WHERE id = ?";
 
-        try(Connection connection = PostgreSQLConnection.getConnection();
+        try(Connection connection = DBConnection.getConnection();
             PreparedStatement ps = connection.prepareStatement(updateUserQuery)) {
             ps.setString(1, user.getSurname());
             ps.setString(2, user.getName());
@@ -82,7 +87,7 @@ public class UsersDao {
 
         String deleteUserQuery = "DELETE FROM users WHERE id = ?";
 
-        try(Connection connection = PostgreSQLConnection.getConnection();
+        try(Connection connection = DBConnection.getConnection();
             PreparedStatement ps = connection.prepareStatement(deleteUserQuery)) {
             ps.setInt(1, user.getId());
 
@@ -109,3 +114,4 @@ public class UsersDao {
         return Optional.empty();
     }
 }
+

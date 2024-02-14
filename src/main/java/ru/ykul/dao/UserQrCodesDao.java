@@ -1,6 +1,6 @@
 package ru.ykul.dao;
 
-import ru.ykul.database.PostgreSQLConnection;
+import ru.ykul.config.DBConnection;
 import ru.ykul.model.UserQrCode;
 
 import java.sql.Connection;
@@ -12,16 +12,16 @@ import java.util.UUID;
 
 public class UserQrCodesDao {
 
-    public void create(int userId) {
+    public void create(UserQrCode userQrCode) {
 
         UUID uuid = UUID.randomUUID();
 
         String createUuidQuery = "INSERT INTO user_qr_codes (user_id, uuid) " +
                 "VALUES (?, ?);";
 
-        try(Connection connection = PostgreSQLConnection.getConnection();
+        try(Connection connection = DBConnection.getConnection();
             PreparedStatement ps = connection.prepareStatement(createUuidQuery)) {
-            ps.setInt(1, userId);
+            ps.setInt(1, userQrCode.getUserId());
             ps.setObject(2, uuid);
 
             ps.executeUpdate();
@@ -38,7 +38,7 @@ public class UserQrCodesDao {
                 "users ON users.id = q.user_id " +
                 "WHERE users.id = ?;";
 
-        try(Connection connection = PostgreSQLConnection.getConnection();
+        try(Connection connection = DBConnection.getConnection();
             PreparedStatement ps = connection.prepareStatement(getUuidQuery)) {
             ps.setInt(1, userId);
             try(ResultSet resultSet = ps.executeQuery()) {
@@ -56,7 +56,7 @@ public class UserQrCodesDao {
         String updateUuidQuery = "UPDATE user_qr_codes SET uuid = ? " +
                 "WHERE user_id = ?";
 
-        try(Connection connection = PostgreSQLConnection.getConnection();
+        try(Connection connection = DBConnection.getConnection();
             PreparedStatement ps = connection.prepareStatement(updateUuidQuery)) {
             ps.setObject(1, uuid);
             ps.setInt(2, userId);
@@ -68,13 +68,13 @@ public class UserQrCodesDao {
         }
     }
 
-    public void delete(int userId) {
+    public void delete(UserQrCode userQrCode) {
 
         String deleteUuidQuery = "DELETE FROM user_qr_codes WHERE user_id = ?";
 
-        try(Connection connection = PostgreSQLConnection.getConnection();
+        try(Connection connection = DBConnection.getConnection();
             PreparedStatement ps = connection.prepareStatement(deleteUuidQuery)) {
-            ps.setInt(1, userId);
+            ps.setInt(1, userQrCode.getUserId());
 
             ps.executeUpdate();
 
@@ -98,3 +98,4 @@ public class UserQrCodesDao {
         return Optional.empty();
     }
 }
+

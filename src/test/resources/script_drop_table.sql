@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS user_qr_codes;
+DROP TABLE IF EXISTS users;

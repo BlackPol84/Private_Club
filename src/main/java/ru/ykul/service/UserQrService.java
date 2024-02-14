@@ -21,9 +21,18 @@ public class UserQrService {
 
     public void checkUserUuid(UUID uuid) {
 
-        Optional<User> userOptional = usersDao.getUserByUuid(uuid);
-        userOptional.ifPresentOrElse(user -> {System.out.println(user.getSurname() +
-                " " + user.getName() + " " + user.getMiddleName()); userQrCodesDao.updateByUserId(user.getId());},
-                () -> System.out.println("Пользователь с uuid: " + uuid + " не найден"));
+        if(uuid != null) {
+
+            Optional<User> userOptional = usersDao.getUserByUuid(uuid);
+            userOptional.ifPresentOrElse(user -> {
+                        System.out.println(user.getSurname() +
+                                " " + user.getName() + " " + user.getMiddleName());
+                        userQrCodesDao.updateByUserId(user.getId());
+                    },
+                    () -> System.out.println("Пользователь с uuid: " + uuid + " не найден"));
+        } else {
+            throw new IllegalArgumentException("The uuid is null");
+        }
     }
 }
+
