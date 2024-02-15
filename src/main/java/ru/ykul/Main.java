@@ -11,7 +11,7 @@ import java.util.UUID;
 public class Main {
     public static void main(String[] args) {
 
-        UUID uuid = UUID.fromString("d67d7d36-dc3f-4425-a9dc-172e13ce84e4");
+        UUID uuid = UUID.fromString("7b051475-bbcf-4497-8e20-1c8bc62bf5ad");
 
         UsersDao usersDao = new UsersDao();
         UserQrCodesDao userQrCodesDao = new UserQrCodesDao();
